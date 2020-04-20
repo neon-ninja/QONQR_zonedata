@@ -9,5 +9,7 @@ grouped_df = df.groupby("ZoneId")
 df["LegionDelta"] = grouped_df["LegionCount"].diff(-1)
 df["SwarmDelta"] = grouped_df["SwarmCount"].diff(-1)
 df["FacelessDelta"] = grouped_df["FacelessCount"].diff(-1)
+df["TotalCount"] = df["LegionCount"] + df["SwarmCount"] + df["FacelessCount"]
+df["TotalDelta"] = df["LegionDelta"].abs() + df["SwarmDelta"].abs() + df["FacelessDelta"].abs()
 df = df.drop_duplicates(['ZoneId'])
 df.to_csv("data/monthly_unique_zones.csv", index=False)
