@@ -12,4 +12,5 @@ df["FacelessDelta"] = grouped_df["FacelessCount"].diff(-1)
 df["TotalCount"] = df["LegionCount"] + df["SwarmCount"] + df["FacelessCount"]
 df["TotalDelta"] = df["LegionDelta"].abs() + df["SwarmDelta"].abs() + df["FacelessDelta"].abs()
 df = df.drop_duplicates(['ZoneId'])
+df = df.drop(columns=["UtmGrid", "GridRef"])
 df.to_csv("data/monthly_unique_zones.csv", index=False)
