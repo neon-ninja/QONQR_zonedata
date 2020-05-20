@@ -5,7 +5,7 @@ import pandas as pd
 
 df = pd.concat([pd.read_csv(f) for f in glob.glob('data/dailyzoneupdates-*.csv')], ignore_index = True)
 df = pd.concat([df, pd.read_csv("data/monthly_unique_zones.csv")], ignore_index = True)
-df = df.drop_duplicates()
+df = df.drop_duplicates(["ZoneId","LastUpdateDateUtc"])
 print("Data loaded")
 df = df.sort_values('LastUpdateDateUtc', ascending=False).groupby("ZoneId").head(2)
 print("Sorted")
