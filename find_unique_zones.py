@@ -22,5 +22,5 @@ df["TotalDelta"] = df["LegionDelta"].abs() + df["SwarmDelta"].abs() + df["Facele
 df = df.drop_duplicates(['ZoneId'])
 df = df.drop(columns=["UtmGrid", "GridRef"])
 print("Calculated")
-df.to_csv("data/monthly_unique_zones.csv", index=False)
+df.to_csv("data/monthly_unique_zones.csv", index=False, float_format='%g')
 print("Saved")
