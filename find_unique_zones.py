@@ -11,12 +11,14 @@ df = df.sort_values('LastUpdateDateUtc', ascending=False).groupby("ZoneId").head
 print("Sorted")
 grouped_df = df.groupby("ZoneId")
 print("Grouped")
-df["LegionDelta"] = grouped_df["LegionCount"].diff(-1)
+agg = {}
+agg["LegionDelta"] = grouped_df["LegionCount"].diff(-1)
 print("LegionDelta")
-df["SwarmDelta"] = grouped_df["SwarmCount"].diff(-1)
+agg["SwarmDelta"] = grouped_df["SwarmCount"].diff(-1)
 print("SwarmDelta")
-df["FacelessDelta"] = grouped_df["FacelessCount"].diff(-1)
+agg["FacelessDelta"] = grouped_df["FacelessCount"].diff(-1)
 print("FacelessDelta")
+df.update(agg)
 df["TotalCount"] = df["LegionCount"] + df["SwarmCount"] + df["FacelessCount"]
 df["TotalDelta"] = df["LegionDelta"].abs() + df["SwarmDelta"].abs() + df["FacelessDelta"].abs()
 df = df.drop_duplicates(['ZoneId'])
