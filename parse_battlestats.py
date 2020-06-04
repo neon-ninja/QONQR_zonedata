@@ -20,8 +20,10 @@ for i in tqdm(files):
     if bits[0] == "/":
         continue
     row["Zone Name"] = bits[0]
-    row["Country"] = bits[1]
-    row["Zone ID"] = bits[2]
+    countrybits = bits[1].split(" / ")
+    row["Region"] = countrybits[0]
+    row["Country"] = countrybits[1]
+    row["Zone ID"] = bits[2].strip("#")
     row["Date"] = soup.find("strong").string
     swarmStart, legionStart, facelessStart, swarmEnd, legionEnd, facelessEnd = [int(e.get_text(strip=True)) for e in soup.find_all("div", class_="progress")]
     row["Swarm Starting Bots"] = swarmStart
