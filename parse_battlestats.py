@@ -7,14 +7,14 @@ from tqdm.auto import tqdm
 
 writer = None
 
-files = os.listdir("battlestats_html")
+files = sorted([int(f.replace(".html", "")) for f in os.listdir("battlestats_html")])
 
-for f in tqdm(files):
-    with open(f"battlestats_html/{f}") as fp:
-        soup = BeautifulSoup(fp.read(), features="lxml")
+for i in tqdm(files):
+    with open(f"battlestats_html/{i}.html") as f:
+        soup = BeautifulSoup(f.read(), features="lxml")
     h1 = soup.find("h1")
     row = {
-        "Battle Report Number": f.replace(".html", "")
+        "Battle Report Number": i
     }
     bits = h1.get_text("\n", strip=True).split("\n")
     if bits[0] == "/":
