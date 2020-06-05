@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import os
 import csv
 from tqdm.auto import tqdm
+import pandas as pd
 
 writer = None
 
@@ -24,7 +25,7 @@ for i in tqdm(files):
     row["Region"] = countrybits[0]
     row["Country"] = countrybits[1]
     row["Zone ID"] = bits[2].strip("#")
-    row["Date"] = soup.find("strong").string
+    row["Date"] = pd.to_datetime(soup.find("strong").string)
     swarmStart, legionStart, facelessStart, swarmEnd, legionEnd, facelessEnd = [int(e.get_text(strip=True)) for e in soup.find_all("div", class_="progress")]
     row["Swarm Starting Bots"] = swarmStart
     row["Legion Starting Bots"] = legionStart
