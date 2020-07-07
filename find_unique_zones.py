@@ -2,9 +2,12 @@
 
 import glob
 import pandas as pd
+from datetime import datetime, timedelta
 
 df = pd.concat([pd.read_csv("data/monthly_unique_zones.csv")] + [pd.read_csv(f) for f in glob.glob('data/dailyzoneupdates-*.csv')], ignore_index = True)
 df = df.drop_duplicates(["ZoneId","LastUpdateDateUtc"])
+mindate = str(datetime.utcnow() - timedelta(days=31))
+df = df[(df.LastUpdateDateUtc > mindate) | ~df.TotalCount.isna()] # filter out day 31
 print("Data loaded")
 df = df.sort_values('LastUpdateDateUtc', ascending=False).groupby("ZoneId").head(2)
 print("Sorted")
