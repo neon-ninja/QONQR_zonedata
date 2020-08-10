@@ -4,6 +4,8 @@ import glob
 import pandas as pd
 from datetime import datetime, timedelta
 
+INT_COLS = ["LegionCount", "SwarmCount", "FacelessCount", "LegionDelta", "SwarmDelta", "FacelessDelta", "TotalCount", "TotalDelta"]
+
 df = pd.concat([pd.read_csv("data/monthly_unique_zones.csv")] + [pd.read_csv(f) for f in glob.glob('data/dailyzoneupdates-*.csv')], ignore_index = True)
 df = df.drop_duplicates(["ZoneId","LastUpdateDateUtc"])
 mindate = str(datetime.utcnow() - timedelta(days=31))
@@ -26,6 +28,7 @@ df["TotalDelta"] = df["LegionDelta"].abs() + df["SwarmDelta"].abs() + df["Facele
 df = df.drop_duplicates(['ZoneId'])
 df = df.drop(columns=["UtmGrid", "GridRef"])
 df = df.sort_values(by=list(df.columns), ascending=False)
+df[INT_COLS] = df[INT_COLS].astype("Int64")
 print("Calculated")
 df.to_csv("data/monthly_unique_zones.csv", index=False, float_format='%g')
 df[df.CountryId == 180].to_csv("data/poland.csv", index=False, float_format='%g')
