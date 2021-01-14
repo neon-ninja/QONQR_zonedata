@@ -1,25 +1,18 @@
 #!/usr/bin/env python3
 
 from bs4 import BeautifulSoup
-import os
-import csv
-from tqdm.auto import tqdm
 import pandas as pd
+import requests
 
-writer = None
-
-files = sorted([int(f.replace(".html", "")) for f in os.listdir("battlestats_html")])
-
-for i in tqdm(files):
-    with open(f"battlestats_html/{i}.html") as f:
-        soup = BeautifulSoup(f.read(), features="lxml")
+def parse_html(BRN, html):
+    soup = BeautifulSoup(html, features="lxml")
     h1 = soup.find("h1")
     row = {
-        "Battle Report Number": i
+        "Battle Report Number": BRN
     }
     bits = h1.get_text("\n", strip=True).split("\n")
     if bits[0] == "/":
-        continue
+        raise Exception("Blank title")
     row["Zone Name"] = bits[0]
     countrybits = bits[1].split(" / ")
     row["Region"] = countrybits[0]
@@ -43,8 +36,23 @@ for i in tqdm(files):
             row[f"{faction} {stat_name}"] = int(td.string.replace(" ", ""))
     playerTable = soup.select_one("div.col-sm-6 > div.table-responsive > table > tbody")
     row["players"] = playerTable.get_text(",", strip=True).replace(" ", "")
+    return row
 
-    if not writer:
-        writer = csv.DictWriter(open('battlestats.csv', 'w', newline=''), fieldnames=row.keys())
-        writer.writeheader()
-    writer.writerow(row)
+df = pd.read_csv("battlestats.csv")
+BRN = df["Battle Report Number"].max()
+
+new_rows = []
+try:
+    while True:
+        BRN += 1
+        print(BRN)
+        r = requests.get(f"https://portal.qonqr.com/Home/BattleStatistics/{BRN}")
+        new_row = parse_html(BRN, r.text)
+        new_rows.append(new_row)
+except Exception as e:
+    print(BRN, e)
+
+new_rows = pd.DataFrame(new_rows)
+df = pd.concat([df, new_rows])
+print(df)
+df.to_csv("battlestats.csv", index=False)
