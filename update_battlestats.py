@@ -42,15 +42,17 @@ df = pd.read_csv("battlestats.csv")
 BRN = df["Battle Report Number"].max()
 
 new_rows = []
-try:
-    while True:
+CURRENT_BRN = 72112
+
+while BRN <= CURRENT_BRN:
+    try:
         BRN += 1
         print(BRN)
         r = requests.get(f"https://portal.qonqr.com/Home/BattleStatistics/{BRN}")
         new_row = parse_html(BRN, r.text)
         new_rows.append(new_row)
-except Exception as e:
-    print(BRN, e)
+    except Exception as e:
+        print(BRN, e)
 
 new_rows = pd.DataFrame(new_rows)
 df = pd.concat([df, new_rows])
