@@ -71,4 +71,5 @@ new_rows = pd.DataFrame(new_rows)
 df = pd.concat([df, new_rows])
 print(df)
 df = df[~df.players.isna()]
+df.Date = pd.to_datetime(df.Date)
 df.to_csv("battlestats.csv", index=False, date_format='%Y-%m-%d')
