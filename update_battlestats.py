@@ -37,6 +37,8 @@ def parse_html(BRN, html):
             row[f"{faction} {stat_name}"] = int(td.string.replace(" ", ""))
     playerTable = soup.select_one("div.col-sm-6 > div.table-responsive > table > tbody")
     row["players"] = playerTable.get_text(",", strip=True).replace(" ", "")
+    if not row["players"]:
+        raise Exception("No players")
     return row
 
 df = pd.read_csv("battlestats.csv")
@@ -68,4 +70,5 @@ while BRN <= CURRENT_BRN:
 new_rows = pd.DataFrame(new_rows)
 df = pd.concat([df, new_rows])
 print(df)
-df.to_csv("battlestats.csv", index=False)
+df = df[~df.players.isna()]
+df.to_csv("battlestats.csv", index=False, date_format='%Y-%m-%d')
