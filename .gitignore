@@ -1,2 +1,5 @@
 *.log
 battlestats_html
+__pycache__
+AllZones.csv
+config.py
