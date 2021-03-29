@@ -34,8 +34,7 @@ for f in files:
     updates = 0
     for e in tqdm(existing_data):
         match = df[df.ZoneId == e["ZoneId"]].iloc[0].to_dict()
-        if match["LastUpdateDateUtc"] > e["LastUpdateDateUtc"]:
-            print(f"Zone {match['ZoneId']}: {match['LastUpdateDateUtc']} > {e['LastUpdateDateUtc']}")
+        if not e["LastUpdateDateUtc"] or match["LastUpdateDateUtc"] > e["LastUpdateDateUtc"]:
             match["TotalCount"] = match["LegionCount"] + match["SwarmCount"] + match["FacelessCount"]
             match["LegionDelta"] = match["LegionCount"] - e["LegionCount"]
             match["SwarmDelta"] = match["SwarmCount"] - e["SwarmCount"]
