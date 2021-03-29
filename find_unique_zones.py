@@ -8,6 +8,8 @@ INT_COLS = ["LegionCount", "SwarmCount", "FacelessCount", "LegionDelta", "SwarmD
 
 df = pd.concat([pd.read_csv("data/monthly_unique_zones.csv")] + [pd.read_csv(f) for f in glob.glob('data/dailyzoneupdates-*.csv')], ignore_index = True)
 df = df.drop_duplicates(["ZoneId","LastUpdateDateUtc"])
+df.LastUpdateDateUtc = pd.to_datetime(df.LastUpdateDateUtc).dt.floor("s")
+df.DateCapturedUtc = pd.to_datetime(df.DateCapturedUtc).dt.floor("s")
 mindate = str(datetime.utcnow() - timedelta(days=31))
 df = df[(df.LastUpdateDateUtc > mindate) | ~df.TotalCount.isna()] # filter out day 31
 print("Data loaded")
