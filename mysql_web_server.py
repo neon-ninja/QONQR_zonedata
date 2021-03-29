@@ -35,7 +35,7 @@ def query(db, query):
 
 @application.get('/')
 def get(db):
-    sql = request.params.get("query", "DESC zones")
+    sql = request.params.get("query", "SHOW TABLES")
     return query(db, sql)
 
 @application.route('/websocket')
