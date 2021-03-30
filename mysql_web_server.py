@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3 -u
 
 import time # Used for tracking query time taken
-import datetime
 import json
 import asyncio
 import http
@@ -25,7 +24,7 @@ def query(db, query):
         results = cur.fetchall()
         for r in results:
             for k, v in r.items():
-                if type(v) is datetime.datetime:
+                if v and type(v) not in [int, float]:
                     r[k] = str(v)
     except Exception as e:
         results = {"error": str(e)}
