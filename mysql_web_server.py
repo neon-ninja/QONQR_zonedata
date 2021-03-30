@@ -1,30 +1,28 @@
 #!/usr/bin/env python3
 
-from bottle import Bottle, request, response, abort
-import bottle_mysql
 import time # Used for tracking query time taken
 import datetime
 import json
+import asyncio
+import http
+import websockets
+from urllib.parse import unquote
+import mysql.connector
 
-from gevent.pywsgi import WSGIServer
-from geventwebsocket import WebSocketError
-from geventwebsocket.handler import WebSocketHandler
-
-application = Bottle()
-plugin = bottle_mysql.Plugin(dbuser='qonqr_ro', dbpass='readonly', dbname='qonqr', dbhost='localhost')
-application.install(plugin)
-
-@application.hook('after_request')
-def enable_cors(): # Cross Origin Resource Sharing - to allow the API to be reached from any website
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, POST, DELETE, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+def create_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="qonqr_ro",
+        password="readonly",
+        database="qonqr"
+    )
 
 def query(db, query):
     s = time.time()
     try:
-        db.execute(query)
-        results = db.fetchall()
+        cur = db.cursor(dictionary=True)
+        cur.execute(query)
+        results = cur.fetchall()
         for r in results:
             for k, v in r.items():
                 if type(v) is datetime.datetime:
@@ -34,32 +32,22 @@ def query(db, query):
     print(f"""Query: {query}. Query completed in {time.time() - s}s, {len(results)} results""")
     return {"results": results}
 
-@application.get('/')
-def get(db):
-    sql = request.params.get("query", "SHOW TABLES")
-    return query(db, sql)
+async def non_ws(path, request_headers):
+    if path != "/websocket":
+        message = unquote(path).strip("/")
+        db = create_db_connection()
+        result = query(db, message)
+        return http.HTTPStatus.OK, [("Content-Type", "application/json")], json.dumps(result).encode("utf-8")
 
-@application.route('/websocket')
-def handle_websocket(db):
-    wsock = request.environ.get('wsgi.websocket')
-    if not wsock:
-        abort(400, 'Expected WebSocket request.')
+async def handle_request(websocket, path):
+    db = create_db_connection()
+    async for message in websocket:
+        result = query(db, message)
+        await websocket.send(json.dumps(result))
 
-    while True:
-        try:
-            sql = wsock.receive()
-            result = query(db, sql)
-            wsock.send(json.dumps(result))
-        except WebSocketError:
-            break
+start_server = websockets.serve(
+    handle_request, "localhost", 8081, process_request=non_ws
+)
 
-if __name__ == "__main__":
-    application.run(
-        host='localhost',
-        port=8081,
-        server='gunicorn',
-        workers=16,
-        worker_class="geventwebsocket.gunicorn.workers.GeventWebSocketWorker",
-        timeout=600,
-        capture_output=True
-    )
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
