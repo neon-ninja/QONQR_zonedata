@@ -4,6 +4,17 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import requests
 import sys
+import mysql.connector
+import config
+
+db = mysql.connector.connect(
+    host="localhost",
+    user=config.user,
+    password=config.password,
+    database="qonqr",
+    autocommit=True
+)
+cur = db.cursor(dictionary=True)
 
 def parse_html(BRN, html):
     soup = BeautifulSoup(html, features="lxml")
@@ -63,6 +74,11 @@ while BRN <= CURRENT_BRN:
         print(BRN)
         r = requests.get(f"https://portal.qonqr.com/Home/BattleStatistics/{BRN}")
         new_row = parse_html(BRN, r.text)
+        keys = ",".join([f"`{k}`" for k in new_row.keys()])
+        values = ",".join([f'"{v}"' for v in new_row.values()])
+        sql = f"REPLACE INTO battlestats ({keys}) VALUES ({values})"
+        print(sql)
+        cur.execute(sql)
         new_rows.append(new_row)
     except Exception as e:
         print(BRN, e)
