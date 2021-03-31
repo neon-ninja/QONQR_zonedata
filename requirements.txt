@@ -2,3 +2,8 @@ mysql-connector-python
 pandas
 tqdm
 websockets
+bottle
+bottle-mysql
+gevent-websocket
+gunicorn
+mysqlclient
