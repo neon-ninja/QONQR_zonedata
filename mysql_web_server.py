@@ -5,6 +5,7 @@ import bottle_mysql
 import time # Used for tracking query time taken
 import datetime
 import json
+import datetime
 
 from gevent.pywsgi import WSGIServer
 from geventwebsocket import WebSocketError
@@ -27,16 +28,16 @@ def query(db, query):
         results = db.fetchall()
         for r in results:
             for k, v in r.items():
-                if v and type(v) not in [int, float]:
+                if v and type(v) is datetime.datetime:
                     r[k] = str(v)
     except Exception as e:
         results = {"error": str(e)}
     print(f"""Query: {query}. Query completed in {time.time() - s}s, {len(results)} results""")
     return {"results": results}
 
-@application.get('/')
-def get(db):
-    sql = request.params.get("query", "SHOW TABLES")
+@application.get('/<sql>')
+def get(db, sql):
+    print(sql)
     return query(db, sql)
 
 @application.route('/websocket')

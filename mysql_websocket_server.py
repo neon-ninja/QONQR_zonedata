@@ -7,6 +7,7 @@ import http
 import websockets
 from urllib.parse import unquote
 import mysql.connector
+import datetime
 
 def create_db_connection():
     return mysql.connector.connect(
@@ -24,7 +25,7 @@ def query(db, query):
         results = cur.fetchall()
         for r in results:
             for k, v in r.items():
-                if v and type(v) not in [int, float]:
+                if v and type(v) is datetime.datetime:
                     r[k] = str(v)
     except Exception as e:
         results = {"error": str(e)}
