@@ -18,11 +18,18 @@ if len(sys.argv) > 1:
     files = sys.argv[1:]
 
 cur = db.cursor(dictionary=True)
+
+print("Fetching existing zone IDs")
+cur.execute(f"SELECT ZoneId FROM zones")
+valid_zone_ids = [r["ZoneId"] for r in cur.fetchall()]
+print(len(valid_zone_ids))
+
 keys = "ZoneId, ZoneControlState, DateCapturedUtc, LegionCount, SwarmCount, FacelessCount, LastUpdateDateUtc".split(", ")
 
 for f in files:
     print(f"Loading {f}")
     df = pd.read_csv(f)
+    df = df[df.ZoneId.isin(valid_zone_ids) & ~pd.isnull(df.LastUpdateDateUtc)]
     df.DateCapturedUtc = pd.to_datetime(df.DateCapturedUtc).dt.floor("s")
     df.LastUpdateDateUtc = pd.to_datetime(df.LastUpdateDateUtc).dt.floor("s")
     print("Loaded")
