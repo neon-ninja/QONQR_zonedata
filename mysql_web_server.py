@@ -28,7 +28,7 @@ def query(db, query):
         results = db.fetchall()
         for r in results:
             for k, v in r.items():
-                if v and type(v) is datetime.datetime:
+                if v and type(v) in [datetime.datetime, datetime.date]:
                     r[k] = str(v)
     except Exception as e:
         results = {"error": str(e)}
@@ -64,3 +64,4 @@ if __name__ == "__main__":
         timeout=600,
         capture_output=True
     )
+
