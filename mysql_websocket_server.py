@@ -25,7 +25,7 @@ def query(db, query):
         results = cur.fetchall()
         for r in results:
             for k, v in r.items():
-                if v and type(v) in [datetime.datetime, datetime.date]
+                if v and type(v) in [datetime.datetime, datetime.date]:
                     r[k] = str(v)
     except Exception as e:
         results = {"error": str(e)}
