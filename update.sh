@@ -6,6 +6,7 @@ cd ..
 python3 import_mysql.py data/dailyzoneupdates-*
 python3 import_mysql_changelog.py data/dailyzoneupdates-*
 python3 update_battlestats.py
+python3 get_exchange_rate.py
 #python3 find_unique_zones.py
 sudo mysql -Be "SELECT ZoneId,Description,RegionId,CountryId,ZoneControlState,DateCapturedUtc,LegionCount,SwarmCount,FacelessCount,LastUpdateDateUtc,Latitude,Longitude,LegionDelta,SwarmDelta,FacelessDelta,TotalCount,TotalDelta FROM qonqr.zones WHERE DATEDIFF(CURDATE(), LastUpdateDateUtc) < 30 ORDER BY TotalCount DESC" > data/monthly_unique_zones.csv
 git add data battlestats.csv
