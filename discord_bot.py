@@ -36,15 +36,10 @@ def format_MAZ():
     latest_date = df.Date.max()
     df = df[df.Date == latest_date]
     print(df)
-    result = f"```ansi\nMost Active Zones for {latest_date} QST:\n\n"
+    result = f"Most Active Zones for {latest_date} QST:\n\n"
     for i, row in df.iterrows():
         link = f'https://portal.qonqr.com/Home/BattleStatistics/{row["Battle Report Number"]}'
-        bots, launches = "", ""
-        for faction, color in colormap.items():
-            bots += colored(f'{row[faction + " Starting Bots"]:,} -> {row[faction + " Ending Bots"]:,} ', color)
-            launches += colored(f'{row[faction + " Total Launches"]}/{row[faction + " Total Active Players"]:,} ', color)
-        result += f'{row["Zone Name"]}, {row["Region"]}, {row["Country"]}: Bots: {bots}. Launches/Players: {launches}\n'
-    result += "```"
+        result += f'[{row["Zone Name"]}, {row["Region"]}, {row["Country"]}](<{link}>)\n'
     print(result)
     print(len(result))
     assert len(result) <= 2000
