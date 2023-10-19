@@ -122,10 +122,10 @@ colormap = {
 }
 
 def format_MAZ(df=None):
-    if not df:
+    if df is None:
         df = pd.read_csv("battlestats.csv")
-        latest_date = df.Date.max()
-        df = df[df.Date == latest_date]
+    latest_date = df.Date.max()
+    df = df[df.Date == latest_date]
     result = f"Most Active Zones for {latest_date} QST:\n\n"
     for i, row in df.iterrows():
         link = f'https://portal.qonqr.com/Home/BattleStatistics/{row["Battle Report Number"]}'
