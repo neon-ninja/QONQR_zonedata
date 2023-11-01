@@ -56,7 +56,7 @@ df = pd.read_csv("battlestats.csv")
 BRN = df["Battle Report Number"].max()
 
 # Get the current max BRN (contained in the last link of the MAZ page)
-html = requests.get("https://portal.qonqr.com/Atlantis/MostActiveZones").text
+html = requests.get("https://portal.qonqr.com/Home/MostActiveZones").text
 soup = BeautifulSoup(html, features="lxml")
 links = soup.find_all("a")
 last_link = links[-1]["href"]
