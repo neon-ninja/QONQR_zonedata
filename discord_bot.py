@@ -9,6 +9,12 @@ import os
 from termcolor import colored
 import datetime
 import pandas as pd
+from pandasai import SmartDataframe
+from langchain.chat_models import ChatOpenAI
+from concurrent.futures import ThreadPoolExecutor
+import logging
+logging.basicConfig()
+logging.getLogger("pandasai").setLevel(logging.DEBUG)
 
 pd.set_option("display.max_columns", None)
 load_dotenv()
@@ -211,5 +217,30 @@ async def nano_range(interaction: discord.Interaction):
         f"Today's nanomissile range is {get_range()} km"
     )
 
+def ai_query(prompt):
+    df = SmartDataframe("battlestats.csv", config={"llm": ChatOpenAI()})
+    result = df.chat(prompt)
+    return result, df.last_result
+
+@tree.command(
+    name="ai", description="Natural language MAZ query using AI magic ✨"
+)
+async def ai(interaction: discord.Interaction, prompt: str):
+    await interaction.response.defer()
+    loop = asyncio.get_event_loop()
+    try:
+        result, last_result = await loop.run_in_executor(ThreadPoolExecutor(), ai_query, prompt)
+        print(result, last_result)
+        if last_result:
+            if last_result["type"] == "plot":
+                await interaction.followup.send(file=discord.File(last_result["value"]), content=f"Prompt: {prompt}. Result:")
+            elif last_result["type"] == "dataframe":
+                await interaction.followup.send(f"Prompt: {prompt}. Result:\n```{last_result['value'].to_markdown()}```")
+            else:
+                await interaction.followup.send(f"Prompt: {prompt}. Result:\n{last_result['value']}")
+        else:
+            await interaction.followup.send(f"Prompt: {prompt}. Result:\n{result}")
+    except:
+        await interaction.followup.send(f"Prompt: {prompt}. Result:\n💀")
 
 client.run(os.getenv("DISCORD_BOT_TOKEN"))

@@ -7,3 +7,5 @@ config.py
 nohup.out
 .env
 bot_memory.json
+temp_chart.png
+cache
