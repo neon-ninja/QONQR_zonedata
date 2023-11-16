@@ -9,7 +9,7 @@ import os
 from termcolor import colored
 import datetime
 import pandas as pd
-from pandasai import SmartDataframe
+from pandasai import SmartDataframe, SmartDatalake
 from langchain.chat_models import ChatOpenAI
 from concurrent.futures import ThreadPoolExecutor
 import logging
@@ -218,7 +218,19 @@ async def nano_range(interaction: discord.Interaction):
     )
 
 def ai_query(prompt):
-    df = SmartDataframe("battlestats.csv", config={"llm": ChatOpenAI()})
+    df = SmartDataframe("battlestats.csv", config={
+        "name": "battles",
+        "llm": ChatOpenAI(),
+        "enable_cache": False,
+        "custom_whitelisted_dependencies": ["PIL"]
+    }).drop(columns=["players"])
+    player_df = SmartDataframe("battlestats_players.csv", config={
+        "name": "players",
+        "llm": ChatOpenAI(),
+        "enable_cache": False,
+        "custom_whitelisted_dependencies": ["PIL"]
+    })
+    df = SmartDatalake([df, player_df], config={"llm": ChatOpenAI(), "enable_cache": False})
     result = df.chat(prompt)
     return result, df.last_result
 

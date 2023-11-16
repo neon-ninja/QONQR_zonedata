@@ -9,12 +9,14 @@ logging.getLogger("pandasai").setLevel(logging.DEBUG)
 
 df = SmartDataframe("battlestats.csv", config={
     "name": "battles",
+    "description": "MAZ battles",
     "llm": ChatOpenAI(),
     "enable_cache": False,
     "custom_whitelisted_dependencies": ["PIL"]
 }).drop(columns=["players"])
 player_df = SmartDataframe("battlestats_players.csv", config={
     "name": "players",
+    "description": "players who fought in the MAZ battles",
     "llm": ChatOpenAI(),
     "enable_cache": False,
     "custom_whitelisted_dependencies": ["PIL"]
