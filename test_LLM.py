@@ -19,8 +19,9 @@ player_df = SmartDataframe("battlestats_players.csv", config={
     "description": "players who fought in the MAZ battles",
     "llm": ChatOpenAI(),
     "enable_cache": False,
-    "custom_whitelisted_dependencies": ["PIL"]
+    "custom_whitelisted_dependencies": ["PIL"],
 })
-df = SmartDatalake([df, player_df], config={"llm": ChatOpenAI(), "enable_cache": False})
-print(df.chat('Group by player name, sum their Total Launches in battles where the country is not Atlantis, sort descending, then print the top 10 as a table'))
+df = SmartDatalake([df, player_df], config={"llm": ChatOpenAI(), "enable_cache": False, "max_retries": 10})
+print(df.chat('Find all players who fought in battles where the Region is Ohio. Group by Player Name, and sum their Total Launches in those battles. Sort by the summed Total Launches descending, and output the top 10 as a table'))
 print(df.last_result)
+print(df.last_code_executed)

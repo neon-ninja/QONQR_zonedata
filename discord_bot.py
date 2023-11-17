@@ -220,17 +220,19 @@ async def nano_range(interaction: discord.Interaction):
 def ai_query(prompt):
     df = SmartDataframe("battlestats.csv", config={
         "name": "battles",
+        "description": "MAZ battles",
         "llm": ChatOpenAI(),
         "enable_cache": False,
         "custom_whitelisted_dependencies": ["PIL"]
     }).drop(columns=["players"])
     player_df = SmartDataframe("battlestats_players.csv", config={
         "name": "players",
+        "description": "players who fought in the MAZ battles",
         "llm": ChatOpenAI(),
         "enable_cache": False,
         "custom_whitelisted_dependencies": ["PIL"]
     })
-    df = SmartDatalake([df, player_df], config={"llm": ChatOpenAI(), "enable_cache": False})
+    df = SmartDatalake([df, player_df], config={"llm": ChatOpenAI(), "enable_cache": False, "max_retries": 10})
     result = df.chat(prompt)
     return result, df.last_result
 
