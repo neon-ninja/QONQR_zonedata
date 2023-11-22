@@ -232,7 +232,14 @@ def ai_query(prompt):
         "enable_cache": False,
         "custom_whitelisted_dependencies": ["PIL"]
     })
-    df = SmartDatalake([df, player_df], config={"llm": ChatOpenAI(), "enable_cache": False, "max_retries": 10})
+    player_details_df = SmartDataframe("player_details.csv", config={
+        "name": "player details",
+        "description": "Details about players",
+        "llm": ChatOpenAI(),
+        "enable_cache": False,
+        "custom_whitelisted_dependencies": ["PIL"],
+    })
+    df = SmartDatalake([df, player_df, player_details_df], config={"llm": ChatOpenAI(), "enable_cache": False, "max_retries": 10})
     result = df.chat(prompt)
     return result, df.last_result
 
