@@ -26,14 +26,14 @@ for i, player in enumerate(tqdm(players)):
     continue
   name, level, faction = [h3.text.strip() for h3 in player_elems.find("h3")]
   level = int(level.replace("Level ", ""))
-  active = player_elems.find("div")[-1].text.strip().split("\n")[0]
+  status = player_elems.find("div")[-1].text.strip().split("\n")[0]
   profile_pic = html.find("img.img-responsive", first=True).attrs["src"]
   start_date = str(pd.to_datetime(html.find("div.media.blue small", first=True).text).date())
   player = {
       "name": name,
       "level": level,
       "faction": faction,
-      "active": active,
+      "status": status,
       "start_date": start_date,
       "profile_pic": profile_pic
   }
