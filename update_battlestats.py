@@ -54,6 +54,7 @@ def parse_html(BRN, html):
 
 df = pd.read_csv("battlestats.csv")
 BRN = df["Battle Report Number"].max()
+assert BRN >= 117536
 
 # Get the current max BRN (contained in the last link of the MAZ page)
 html = requests.get("https://portal.qonqr.com/Home/MostActiveZones").text
